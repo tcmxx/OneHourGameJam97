@@ -11,9 +11,18 @@ public class GameController : MonoBehaviour {
 	public Transform respawnPoint;
 	public Transform enemyPointRight;
 	public Transform enemyPointLeft;
-	Harri currentHarri;
+	public GameObject starPref;
+	public Harri currentHarri;
 
 	public int point;
+
+	public float totalTimer;
+	public readonly float  increaseDiffTime = 30.0f;
+	float nextTime;
+
+	public float timeLeft;
+	public AudioClip background;
+	public AudioClip gameover;
 
 	void Awake(){
 		gameController = this;
@@ -23,12 +32,31 @@ public class GameController : MonoBehaviour {
 	void Start () {
 		Respawn ();
 		point = 0;
-		InvokeRepeating ("RandomInvoke", 2f,5.0f);
+		Invoke ("RandomInvoke",0.0f);
+		totalTimer = 0;
+		nextTime = Random.Range (3.0f, 8.0f);
+		timeLeft = 60;
+		AudioSource.PlayClipAtPoint (background,transform.position);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+		totalTimer += Time.deltaTime;
+		timeLeft -= Time.deltaTime;
+
+		if (timeLeft <= 0) {
+			Timeup ();
+		}
+		if (nextTime < totalTimer) {
+			totalTimer = 0;
+			Invoke ("RandomInvoke",0.0f);
+			if(timeLeft < 20)
+				nextTime = Random.Range (4.0f, 8.0f);
+			else if(timeLeft < 40)
+				nextTime = Random.Range (3.0f, 7.0f);
+			else
+				nextTime = Random.Range (2.0f, 6.0f);
+		}
 	}
 
 	public void Respawn(){
@@ -37,19 +65,21 @@ public class GameController : MonoBehaviour {
 
 
 	private void RandomInvoke(){
-		RespawnEnemy (Random.Range (0, 1) > 0.5f);
+		RespawnEnemy (Random.Range (0, 100) > 30);
 	}
 
 	public void RespawnEnemy(bool right){
 		Transform sp = right ? enemyPointRight : enemyPointLeft;
 		Enemy emey = GameObject.Instantiate (enemyPref,sp.position,sp.rotation).GetComponent <Enemy>();
 		emey.Initialize (right);
+		print (right);
 	}
 
 
 	public void Enter(){
 		if (!CheckWetherSeen ()) {
 			Destroy (currentHarri.gameObject);
+			GameObject.Destroy (GameObject.Instantiate (starPref,currentHarri.transform.position, currentHarri.transform.rotation),1);
 			Respawn ();
 			point++;
 		} else {
@@ -62,6 +92,8 @@ public class GameController : MonoBehaviour {
 		foreach (var enemy in enemies) {
 			if (enemy.GetComponent <Enemy> ().CheckSeen ()) {
 				print ("seen");
+				currentHarri.ChangeSurprise ();
+				currentHarri.GetComponent <PlayerInput> ().enabled = false;
 				return true;
 			}
 		}
@@ -70,5 +102,20 @@ public class GameController : MonoBehaviour {
 	}
 
 	public void Lose(){
+		GameUI.ui.ShowLose ();
+		AudioSource.PlayClipAtPoint (gameover,transform.position);
+	}
+	public void Timeup(){
+		currentHarri.ChangeSurprise ();
+		currentHarri.GetComponent <PlayerInput> ().enabled = false;
+		GameUI.ui.ShowTimeUp ();
+		AudioSource.PlayClipAtPoint (gameover,transform.position);
+	}
+	public void Restart(){
+		Destroy (currentHarri.gameObject);
+		Respawn ();
+		point = 0;
+		totalTimer = 0;
+		timeLeft = 60;
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MenuUI : MonoBehaviour {
 
@@ -12,5 +13,9 @@ public class MenuUI : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		
+	}
+
+	public void StartSGame(){
+		SceneManager.LoadScene ("GameScene");
 	}
 }

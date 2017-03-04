@@ -6,10 +6,14 @@ using UnityEngine.UI;
 public class Enemy : MonoBehaviour {
 
 	public LayerMask playerMask;
+	public Sprite supriseSprite;
+	public SpriteRenderer rend;
+
 
 	private bool movingRight;
 	public void Initialize(bool right){
 		movingRight = !right;
+		rend.flipX = !right;
 	}
 
 	// Use this for initialization
@@ -24,11 +28,28 @@ public class Enemy : MonoBehaviour {
 	}
 
 	public bool CheckSeen(){
-		RaycastHit2D hit = Physics2D.Raycast (transform.position,Vector3.right*(movingRight?1:-1),100,playerMask);
+		bool seen = false;
+		if(movingRight){
+			if (GameController.gameController.currentHarri.transform.position.x > transform.position.x) {
+				seen = true;
+			}
+		}else{
+			if (GameController.gameController.currentHarri.transform.position.x < transform.position.x) {
+				seen = true;
+			}
+		}
 
-		return hit.collider != null;
+
+		if (seen) {
+			ChangeSpriteToSurprise ();
+			return true;
+		}
+		return false;
 		
 	}
 
+	public void ChangeSpriteToSurprise(){
+		rend.sprite = supriseSprite;
+	}
 
 }
