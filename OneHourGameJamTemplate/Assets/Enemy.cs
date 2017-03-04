@@ -14,17 +14,18 @@ public class Enemy : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		Destroy (gameObject,5);
+		Destroy (gameObject,10);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		transform.position = transform.position + Vector3.right * (movingRight?1:-1) * Time.deltaTime * 1;
+		transform.position = transform.position + Vector3.right * (movingRight?1:-1) * Time.deltaTime * 3;
 
 	}
 
 	public bool CheckSeen(){
 		RaycastHit2D hit = Physics2D.Raycast (transform.position,Vector3.right*(movingRight?1:-1),100,playerMask);
+
 		return hit.collider != null;
 		
 	}

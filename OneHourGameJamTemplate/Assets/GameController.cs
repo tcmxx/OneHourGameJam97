@@ -23,7 +23,7 @@ public class GameController : MonoBehaviour {
 	void Start () {
 		Respawn ();
 		point = 0;
-		InvokeRepeating ("RandomInvoke", 2f,4.0f);
+		InvokeRepeating ("RandomInvoke", 2f,5.0f);
 	}
 	
 	// Update is called once per frame
@@ -61,10 +61,11 @@ public class GameController : MonoBehaviour {
 		GameObject[] enemies = GameObject.FindGameObjectsWithTag ("Enemy");
 		foreach (var enemy in enemies) {
 			if (enemy.GetComponent <Enemy> ().CheckSeen ()) {
+				print ("seen");
 				return true;
 			}
 		}
-
+		print ("not seen");
 		return false;
 	}
 
